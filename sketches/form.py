@@ -37,7 +37,7 @@ void main() {
     vec3 p = ray_march(ro, rd);
     vec3 d = get_normal(p);
 
-    vec3 col = vec3(d * 0.5 + 0.5);
+    vec3 col = vec3(-d * 0.5 + 0.5);
 
     //d *= rotateY(time*0.05);
 
