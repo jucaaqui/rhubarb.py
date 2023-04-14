@@ -6,9 +6,10 @@ float scene_sdf(vec3 p) {
 
     scene = min(scene,
         box_sdf(fract(p + 0.5) - 0.5, 
-        noise_vec3(rand(floor(p.xyz + 0.5)) + amp * 5.0) * 0.4 + 0.09));
+        rand_vec3(rand(floor(p.xy + 0.5)) + 1.7) * 0.3 + 0.15)
+        + amp);
 
-    float k = 0.49;
+    float k = 0.45;
 
     scene = min(scene, 
                 box_sdf((fract(p + 0.5) - 0.5) - vec3(1.0, 0.0, 0.0),
@@ -30,32 +31,25 @@ float scene_sdf(vec3 p) {
                 vec3(k)));
 
     scene = max(scene,
-        box_sdf(p - vec3(1000.0, 1000.0, 1000.0), vec3(1000.0, 1000.0, 1000.0)));
+        -box_sdf(p - vec3(0.0, 0.0, 0.0), vec3(0.5, 0.5, 99999.0)));
 
-
-/*
     scene = max(scene,
         box_sdf(p - vec3(0.0, 0.0, 0.0), vec3(10.0, 10.0, 10.0)));
-*/
 
     return scene;
 }
 
 vec4 get_col(vec2 xy) {
-    xy *= vec2(1.0, -1.0);
 
-    vec3 ro = vec3(-5.0, 0.0, 0.0);
-    vec3 rd = normalize(vec3(2.0, -xy));
+    vec3 ro = vec3(0.0, 0.0, t * t * 60.0);
+    vec3 rd = normalize(vec3(1.0, -xy));
 
     //vec3 theta = noise_vec3(time * 0.002) * 4.0*PI;
-
-    vec3 theta = vec3(0, -15 - 30*t, 45);
+    vec3 theta = vec3(0, -(230*t*t + 120), 100*t + 10);
     theta = radians(theta);
 
-    ro *= rotate(theta);
+    //ro *= rotate(theta);
     rd *= rotate(theta);
-
-    ro += vec3(0.0, 0.0, t * 50.0);
 
     vec3 p = ray_march(ro, rd);
     vec3 d = get_normal(p);
@@ -79,7 +73,6 @@ vec4 get_col(vec2 xy) {
 void main() {
     vec2 xy = vec2(id - target_size*0.5) / target_size.y;
 
-
     vec2 pix_dim = 1.0 / target_size;
 
     vec4 col = (
@@ -87,6 +80,7 @@ void main() {
         + get_col(xy + vec2(0.0, 0.5) * pix_dim)
         + get_col(xy + vec2(0.5, 0.0) * pix_dim)
         + get_col(xy + vec2(0.5, 0.5) * pix_dim)) * 0.25;
+
 
     imageStore(target, id, col);
 }
@@ -106,7 +100,7 @@ import math
 from moviepy.video.io.ffmpeg_reader import FFMPEG_VideoReader
 from moviepy.video.io.ffmpeg_writer import FFMPEG_VideoWriter
 
-last_frame = 24 * 60 * 5
+last_frame = 24 * 60 * 3
 
 target = Texture("target", (1920, 1080))
 vid0   = Texture("vid0", target.size)
@@ -123,17 +117,17 @@ shader = Shader(source, target.size,
                 + SDF
                 + RAYMARCHING)
 
-p0 = FFMPEG_VideoReader("res/d.MOV")
-p1 = FFMPEG_VideoReader("res/a.MOV")
-p2 = FFMPEG_VideoReader("res/b.MOV")
-p3 = FFMPEG_VideoReader("res/c.MOV")
+p0 = FFMPEG_VideoReader("res/0.MOV")
+p1 = FFMPEG_VideoReader("res/1.MOV")
+p2 = FFMPEG_VideoReader("res/5.MOV")
+p3 = FFMPEG_VideoReader("res/6.MOV")
 
 vid0.set_data(p0.read_frame())
 vid1.set_data(p1.read_frame())
 vid2.set_data(p2.read_frame())
 vid3.set_data(p3.read_frame())
 
-_, audio = scipy.io.wavfile.read('res/3.wav')
+_, audio = scipy.io.wavfile.read('res/1.wav')
 
 shader.dispatch()
 

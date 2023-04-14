@@ -1,11 +1,6 @@
 
 source = """
 
-#include <common>
-#include <noise>
-#include <sdf>
-#include <raymarching>
-
 float scene_sdf(vec3 p) {
         
 
@@ -55,9 +50,11 @@ void main() {
 
 from rhubarb.shader  import Shader
 from rhubarb.texture import Texture
+from rhubarb.glsl    import common, noise, sdf, raymarching
 
 target = Texture("target", (1000, 1000))
-cube = Shader(source, target.size) 
+cube = Shader(source, target.size,
+              common + noise + sdf + raymarching) 
 
 def draw():
     cube.dispatch()

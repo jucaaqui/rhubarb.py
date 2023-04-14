@@ -1,8 +1,6 @@
 
 init_source = """
 
-#include <common>
-
 void main() {
     vec4 val = vec4(1.0, 1.0, 1.0, 1.0);
 
@@ -50,13 +48,14 @@ void main() {
 
 """
 
-from rhubarb.texture import *
-from rhubarb.shader  import *
+from rhubarb.texture import Texture
+from rhubarb.shader  import Shader
+from rhubarb.glsl    import common
 
 target = Texture("world", (500, 500))
 buff  = Texture("buff", target.size)
 
-init = Shader(init_source, target.size)
+init = Shader(init_source, target.size, common)
 next = Shader(next_source, target.size)
 swap = Shader(swap_source, target.size)
 

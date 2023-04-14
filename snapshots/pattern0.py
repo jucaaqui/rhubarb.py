@@ -1,6 +1,9 @@
 
 source = """
 
+#include <common>
+#include <noise>
+
 float n(vec2 p) {
     return mod(snoise(p) + snoise(vec2(time*0.01, p.x)), 0.4) < 0.2 ? 1.0 : 0.0;
 }
@@ -55,11 +58,9 @@ void main() {
 
 from rhubarb.texture import Texture
 from rhubarb.shader  import Shader
-from rhubarb.glsl    import common, noise
 
 target = Texture("target", (1000, 1000))
-shader = Shader(source, target.size, common + noise)
+shader = Shader(source, target.size)
 
 def draw():
     shader.dispatch()
-
